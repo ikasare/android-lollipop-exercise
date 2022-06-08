@@ -1,14 +1,21 @@
 package com.codepath.android.lollipopexercise.activities;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.palette.graphics.Palette;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.codepath.android.lollipopexercise.R;
 import com.codepath.android.lollipopexercise.models.Contact;
 
@@ -37,7 +44,31 @@ public class DetailsActivity extends AppCompatActivity {
         mContact = Parcels.unwrap(getIntent().getParcelableExtra(DetailsActivity.EXTRA_CONTACT));
 
         // Fill views with data
-        Glide.with(DetailsActivity.this).load(mContact.getThumbnailDrawable()).centerCrop().into(ivProfile);
+        CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                // TODO 1. Instruct Glide to load the bitmap into the `holder.ivProfile` profile image view
+                Glide.with(DetailsActivity.this).asBitmap().load(resource).into(ivProfile);
+                Palette palette = Palette.from(resource).generate();
+                Palette.Swatch vibarnt = palette.getVibrantSwatch();
+
+                // TODO 2. Use generate() method from the Palette API to get the vibrant color from the bitmap
+                // Set the result as the background color for `holder.vPalette` view containing the contact's name.
+                if (vibarnt != null){
+                    // set background color based on vibrant color
+                    vPalette.setBackgroundColor(vibarnt.getRgb());
+                    // update title textview with color
+                    tvName.setTextColor(vibarnt.getTitleTextColor());
+                }
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                // can leave empty
+            }
+        };
+
+        Glide.with(this).asBitmap().load(mContact.getThumbnailDrawable()).centerCrop().into(target);
         tvName.setText(mContact.getName());
         tvPhone.setText(mContact.getNumber());
     }

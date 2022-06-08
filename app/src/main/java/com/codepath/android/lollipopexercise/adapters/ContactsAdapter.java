@@ -3,15 +3,22 @@ package com.codepath.android.lollipopexercise.adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.codepath.android.lollipopexercise.R;
 import com.codepath.android.lollipopexercise.activities.ContactsActivity;
 import com.codepath.android.lollipopexercise.activities.DetailsActivity;
@@ -48,6 +55,32 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.VH> {
         holder.rootView.setTag(contact);
         holder.tvName.setText(contact.getName());
         Glide.with(mContext).load(contact.getThumbnailDrawable()).centerCrop().into(holder.ivProfile);
+
+        CustomTarget<Bitmap> target = new CustomTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                // TODO 1. Instruct Glide to load the bitmap into the `holder.ivProfile` profile image view
+                Glide.with(mContext).asBitmap().load(resource).into(holder.ivProfile);
+                Palette palette = Palette.from(resource).generate();
+                Palette.Swatch vibarnt = palette.getVibrantSwatch();
+
+                // TODO 2. Use generate() method from the Palette API to get the vibrant color from the bitmap
+                // Set the result as the background color for `holder.vPalette` view containing the contact's name.
+                if (vibarnt != null){
+                    // set background color based on vibrant color
+                    holder.vPalette.setBackgroundColor(vibarnt.getRgb());
+                    // update title textview with color
+                    holder.tvName.setTextColor(vibarnt.getTitleTextColor());
+                }
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+                // can leave empty
+            }
+        };
+
+        Glide.with(mContext).asBitmap().load(contact.getThumbnailDrawable()).centerCrop().into(target);
     }
 
     @Override
@@ -61,6 +94,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.VH> {
         final ImageView ivProfile;
         final TextView tvName;
         final View vPalette;
+
+
 
         public VH(View itemView, final Context context) {
             super(itemView);
@@ -86,4 +121,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.VH> {
             });
         }
     }
+
+
+
 }
