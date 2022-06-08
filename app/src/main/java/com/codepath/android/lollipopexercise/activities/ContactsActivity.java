@@ -3,14 +3,17 @@ package com.codepath.android.lollipopexercise.activities;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.codepath.android.lollipopexercise.R;
 import com.codepath.android.lollipopexercise.adapters.ContactsAdapter;
 import com.codepath.android.lollipopexercise.models.Contact;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.List;
 
@@ -63,5 +66,23 @@ public class ContactsActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         return super.onOptionsItemSelected(item);
+    }
+    public void onComposeAction(MenuItem mi) {
+        // handle click here
+        Contact randomContact = Contact.getRandomContact(ContactsActivity.this);
+        contacts.add(randomContact);
+        mAdapter.notifyDataSetChanged();
+        Snackbar.make(rvContacts, R.string.snackbar_text, Snackbar.LENGTH_LONG)
+                .setAction(R.string.snackbar_action, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        contacts.remove(contacts.size()-1);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                })
+                .setActionTextColor(ContextCompat.getColor(ContactsActivity.this, R.color.accent)).show();
+        mAdapter.notifyItemInserted(contacts.size() - 1);  // contacts.size() - 1 is the last element position
+        rvContacts.scrollToPosition(mAdapter.getItemCount() - 1); // update based on adapter
+
     }
 }
