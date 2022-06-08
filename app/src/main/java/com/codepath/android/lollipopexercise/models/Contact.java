@@ -6,9 +6,12 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 
+import org.parceler.Parcel;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+@Parcel
 
 // Container class to hold Contact information.
 public class Contact implements Serializable {
@@ -21,6 +24,8 @@ public class Contact implements Serializable {
         mThumbnailDrawable = thumbnailDrawable;
         mNumber = number;
     }
+
+    public Contact() {};
 
     public String getName() {
         return mName;
